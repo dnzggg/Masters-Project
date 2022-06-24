@@ -69,6 +69,15 @@ def main():
     vehicle.apply_control(carla.VehicleControl(throttle=0.2, steer=0.0, brake=0.0, hand_brake=False, reverse=False,
                                                manual_gear_shift=False, gear=0))
 
+    world.tick()
+    time.sleep(5)
+    image_queue = queue.Queue()
+    camera.listen(image_queue.put)
+    for i in range(10):
+        world.tick()
+        image = image_queue.get()
+        image.save_to_disk('%s/%s.png' % (camera.type_id, image.frame))
+
     # camera.destroy()
     # vehicle.destroy()
 

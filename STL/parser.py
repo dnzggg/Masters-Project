@@ -4,9 +4,9 @@ from functools import partialmethod, reduce
 from typing import TypeVar
 
 from parsimonious import Grammar, NodeVisitor
+
 from STL import ast
 from STL import sugar
-
 
 MTL = TypeVar("STL")
 

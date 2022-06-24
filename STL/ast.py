@@ -8,7 +8,6 @@ from lenses import bind
 
 from STL import sugar
 
-
 Node = TypeVar("Node")
 
 
