@@ -39,7 +39,7 @@ def evaluate_f(phi, sig, time, t=0, points=500, time_period=20):
         return evaluate(phi.arg, sig, time, t)
     m = -float('inf')
     for j, n in enumerate(next_ab):
-        temp = evaluate(phi.arg, sig, time, t + a * int(points/time_period) + j)
+        temp = evaluate(phi.arg, sig, time, int(t + a * int(points/time_period) + j))
         if temp > m:
             m = temp
     return m
@@ -48,15 +48,15 @@ def evaluate_f(phi, sig, time, t=0, points=500, time_period=20):
 @evaluate.register(ast.F_)
 def evaluate_f_(phi, sig, time, t=0, points=500, time_period=20):
     a, b = phi.interval
-    if t - b - a == -float('inf'):
+    if t - b == -float('inf'):
         prev_ab = sig[:t]
     else:
-        prev_ab = sig[int(t - (b - a) * int(points/time_period)):int(t - a * int(points/time_period))]
+        prev_ab = sig[int(t - b * int(points/time_period)):int(t - a * int(points/time_period))]
     if len(prev_ab) <= 0:
         return evaluate(phi.arg, sig, time, t)
     m = -float('inf')
     for j, n in enumerate(prev_ab):
-        temp = evaluate(phi.arg, sig, time, t - (b - a) * int(points/time_period) + j)
+        temp = evaluate(phi.arg, sig, time, int(t - b * int(points/time_period) + j))
         if temp > m:
             m = temp
     return m

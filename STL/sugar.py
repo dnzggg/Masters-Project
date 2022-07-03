@@ -25,6 +25,7 @@ def xor(x, y):
 def iff(x, y):
     return (x & y) | (~x & ~y)
 
+
 def until(phi, psi):
     return ast.Until(phi, psi) & env(psi)
 
