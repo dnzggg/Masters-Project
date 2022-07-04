@@ -9,6 +9,7 @@ param carla_map = 'Town05'
 model scenic.simulators.carla.model
 
 EGO_MODEL = "vehicle.tesla.model3"
+BACKGROUND_MODEL = "vehicle.toyota.prius"
 EGO_SPEED = 10
 
 # EGO BEHAVIOR: Follow lane and brake when reaches threshold distance to obstacle
@@ -29,6 +30,7 @@ for _ in range(5):
     spot = OrientedPoint on lane.centerline
 
     background_car = Car at spot,
+        with blueprint BACKGROUND_MODEL,
         with behavior AutopilotBehavior()
     background_vehicles.append(background_car)
 
