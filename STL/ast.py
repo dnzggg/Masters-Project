@@ -127,7 +127,7 @@ def ast_class(cls):
     cls.iff = sugar.iff
     cls.implies = sugar.implies
     # Avoid circular dependence.
-    cls.weak_until = lambda a, b: WeakUntil(a, b)
+    # cls.weak_until = lambda a, b: WeakUntil(a, b)
     cls.until = sugar.until
     cls.timed_until = sugar.timed_until
     cls.always = sugar.alw
@@ -215,20 +215,24 @@ class ModalOp:
 
     @property
     def children(self):
-        return (self.arg,)
+        return self.arg,
 
 
 class G(ModalOp):
     OP = "G"
 
+
 class F(ModalOp):
     OP = "F"
+
 
 class G_(ModalOp):
     OP = "H"
 
+
 class F_(ModalOp):
     OP = "O"
+
 
 @ast_class
 class Until:

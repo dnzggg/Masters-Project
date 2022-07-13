@@ -8,11 +8,14 @@ def alw(phi, *, lo=0, hi=float('inf')):
 def env(phi, *, lo=0, hi=float('inf')):
     return ast.F(ast.Interval(lo, hi), phi)
 
+
 def once(phi, *, lo=0, hi=float('inf')):
     return ast.F_(ast.Interval(lo, hi), phi)
 
+
 def historically(phi, *, lo=0, hi=float('inf')):
     return ~once(~phi, lo=lo, hi=hi)
+
 
 def implies(x, y):
     return ~x | y

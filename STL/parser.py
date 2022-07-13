@@ -14,7 +14,7 @@ MTL = TypeVar("STL")
 MTL_GRAMMAR = Grammar(u'''
 phi = (neg / paren_phi / next / bot / top / smaller / smaller_equal
      / xor_outer / iff_outer / implies_outer / and_outer / or_outer
-     / timed_until / until / weak_until / f / g / AP)
+     / timed_until / until / weak_until / f / g / o / h / AP)
 
 paren_phi = "(" __ phi __ ")"
 neg = ("~" / "¬") __ phi
@@ -40,6 +40,8 @@ smaller_equal = "(" __ (AP __ ("<=") __ const) __ ")"
 
 f = ("< >" / "F") interval? __ phi
 g = ("[ ]" / "G") interval? __ phi
+o = ("<->" / "O") interval? __ phi
+h = ("[-]" / "H") interval? __ phi
 weak_until = "(" __ phi _ "W" _ phi __ ")"
 until = "(" __ phi _ "U" _ phi __ ")"
 timed_until = "(" __ phi _ "U" interval _ phi __ ")"
@@ -124,6 +126,8 @@ class MTLVisitor(NodeVisitor):
 
     visit_f = partialmethod(unary_temp_op_visitor, op=sugar.env)
     visit_g = partialmethod(unary_temp_op_visitor, op=sugar.alw)
+    visit_o = partialmethod(unary_temp_op_visitor, op=sugar.once)
+    visit_h = partialmethod(unary_temp_op_visitor, op=sugar.historically)
 
     def visit_weak_until(self, _, children):
         _, _, phi1, _, _, _, phi2, _, _ = children
@@ -144,7 +148,6 @@ class MTLVisitor(NodeVisitor):
         return ast.AtomicPred(self.visit_id(*args))
 
     def visit_smaller(self, *args):
-        expr = self.visit_id(*args)
         return ast.AtomicExpr(self.visit_id(*args))
 
     def visit_smaller_equal(self, *args):

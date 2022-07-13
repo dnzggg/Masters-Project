@@ -1,6 +1,7 @@
 from functools import singledispatch
 
 from STL import ast
+import re
 
 
 @singledispatch
@@ -12,34 +13,31 @@ def evaluate(phi, sig, time, t=0, points=500, time_period=20):
 @evaluate.register(ast.AtomicPred)
 def evaluate_ap(phi, sig, time, t=0, points=500, time_period=20):
     p = str(phi).strip("(").strip(")").replace(" ", "")
-    if p[0] == "x":
-        return float('inf') if sig[t] else -float('inf')
-    elif p[0] == "t":
-        return float('inf') if time[t] else -float('inf')
+    return float('inf') if sig[p[0]][t] else -float('inf')
 
 
 @evaluate.register(ast.AtomicExpr)
 def evaluate_ae(phi, sig, time, t=0, points=500, time_period=20):
     p = str(phi).strip("(").strip(")").replace(" ", "")
     p = p.split("<")
-    if p[0] == "x":
-        return sig[t] - float(p[1])
-    elif p[0] == "t":
-        return time[t] - float(p[1])
+    return sig[p[0]][t] - float(p[1])
 
 
 @evaluate.register(ast.F)
 def evaluate_f(phi, sig, time, t=0, points=500, time_period=20):
+    p = re.sub(r"(\d)+(\.\d)?,((\d)+(\.\d)?|inf)", "", str(phi))
+    p = p.strip("F").strip("[").strip("]").strip("~").strip("(").strip(")").replace(" ", "")
+    p = p.split("<")
     a, b = phi.interval
     if t + b == float('inf'):
-        next_ab = sig[t:]
+        next_ab = sig[p[0]][t:]
     else:
-        next_ab = sig[int(t + a * int(points/time_period)):int(t + b * int(points/time_period))]
+        next_ab = sig[p[0]][int(t + a * points/time_period):int(t + b * points/time_period)]
     if len(next_ab) <= 0:
         return evaluate(phi.arg, sig, time, t)
     m = -float('inf')
     for j, n in enumerate(next_ab):
-        temp = evaluate(phi.arg, sig, time, int(t + a * int(points/time_period) + j))
+        temp = evaluate(phi.arg, sig, time, int(t + a * points/time_period + j))
         if temp > m:
             m = temp
     return m
@@ -47,16 +45,28 @@ def evaluate_f(phi, sig, time, t=0, points=500, time_period=20):
 
 @evaluate.register(ast.F_)
 def evaluate_f_(phi, sig, time, t=0, points=500, time_period=20):
+    p = re.sub(r"(\d)+(\.\d)?,((\d)+(\.\d)?|inf)", "", str(phi))
+    p = p.strip("O").strip("[").strip("]").strip("~").strip("(").strip(")").replace(" ", "")
+    p = p.split("<")
     a, b = phi.interval
     if t - b == -float('inf'):
-        prev_ab = sig[:t]
+        prev_ab = sig[p[0]][:t]
+    elif int(t - b * points/time_period) < 0:
+        if int(t - a * points/time_period) < 0:
+            prev_ab = []
+        else:
+            prev_ab = sig[p[0]][:int(t - a * points/time_period)]
     else:
-        prev_ab = sig[int(t - b * int(points/time_period)):int(t - a * int(points/time_period))]
+        prev_ab = sig[p[0]][int(t - b * points/time_period):int(t - a * points/time_period)]
+    print(prev_ab)
     if len(prev_ab) <= 0:
         return evaluate(phi.arg, sig, time, t)
     m = -float('inf')
     for j, n in enumerate(prev_ab):
-        temp = evaluate(phi.arg, sig, time, int(t - b * int(points/time_period) + j))
+        if t - b * int(points/time_period) < 0:
+            temp = evaluate(phi.arg, sig, time, j)
+        else:
+            temp = evaluate(phi.arg, sig, time, int(t - b * points/time_period + j))
         if temp > m:
             m = temp
     return m
