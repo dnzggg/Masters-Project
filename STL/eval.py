@@ -58,7 +58,6 @@ def evaluate_f_(phi, sig, time, t=0, points=500, time_period=20):
             prev_ab = sig[p[0]][:int(t - a * points/time_period)]
     else:
         prev_ab = sig[p[0]][int(t - b * points/time_period):int(t - a * points/time_period)]
-    print(prev_ab)
     if len(prev_ab) <= 0:
         return evaluate(phi.arg, sig, time, t)
     m = -float('inf')
