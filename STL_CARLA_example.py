@@ -3,6 +3,7 @@ import os
 import re
 import sys
 import matplotlib.pyplot as plt
+from scenario_runner.srunner.metrics.tools.metrics_log import MetricsLog
 
 import STL
 
@@ -33,21 +34,27 @@ def main():
     settings.fixed_delta_seconds = 0.05
     world.apply_settings(settings)
 
-    file = "C:/Users/Deniz Gorur/PycharmProjects/Masters Project/Scenic examples/records/scenario1.log"
+    file = "C:/Users/Deniz Gorur/PycharmProjects/Masters Project/records/FollowLeadingVehicle_1.log"
     info = client.show_recorder_file_info(file, True)
-    frames = int(re.search(r"Frames: (\d+)", info).group(1))
-    duration = float(re.search(r"Duration: (\d+)\.(\d+)", info).group(1))
-    client.replay_file(file, 0, 0, 2028)
 
+    log = MetricsLog(info)
+
+    frames = log.get_total_frame_count()
+    duration = log.get_delta_time(frames - 1)
+
+    ego_id = log.get_ego_vehicle_id()
+    adv_id = log.get_actor_ids_with_role_name("scenario")[0]
+
+    client.replay_file(file, 0, 0, ego_id)
     world.tick()
 
     actor_list = world.get_actors()
-    vehicle = list(actor_list.filter('vehicle.tesla.model3'))[0]
-    vehicle2 = list(actor_list.filter('vehicle.toyota.prius'))[0]
+    vehicle = actor_list.find(ego_id)
+    vehicle2 = actor_list.find(adv_id)
 
     x = STL.parse('(x<20)')
     y = STL.parse('<->[0,1] y')
-    phi = y
+    phi = x.once(lo=0, hi=5)
 
     robustness = []
     b_robustness = []
@@ -58,6 +65,8 @@ def main():
 
     for i in range(frames * 2):
         world.tick()
+        if vehicle.get_location() == carla.Location(0, 0, 0) or vehicle2.get_location() == carla.Location(0, 0, 0):
+            break
         dist = vehicle.get_location().distance(vehicle2.get_location())
         sig["x"].append(dist)
         sig["y"].append(vehicle.is_at_traffic_light())
@@ -75,7 +84,7 @@ def main():
     for a in sensors:
         a.destroy()
 
-    plt.plot(time, sig["y"], time, robustness, "r--")
+    plt.plot(time, sig["x"], time, robustness, "r--")
     plt.show()
 
 
