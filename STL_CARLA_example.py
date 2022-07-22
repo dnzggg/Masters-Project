@@ -30,11 +30,9 @@ def main():
     world = client.get_world()
 
     settings = world.get_settings()
-    settings.synchronous_mode = True
-    settings.fixed_delta_seconds = 0.05
     world.apply_settings(settings)
 
-    file = "C:/Users/Deniz Gorur/PycharmProjects/Masters Project/records/FollowLeadingVehicle_1.log"
+    file = os.path.dirname(__file__) + "/records/FollowLeadingVehicle_1.log"
     info = client.show_recorder_file_info(file, True)
 
     log = MetricsLog(info)
@@ -60,11 +58,10 @@ def main():
     b_robustness = []
     sig = {"x": [], "y": []}
     time = []
-    points = frames * 2
+    points = frames
     time_period = duration
 
-    for i in range(frames * 2):
-        world.tick()
+    for i in range(points):
         if vehicle.get_location() == carla.Location(0, 0, 0) or vehicle2.get_location() == carla.Location(0, 0, 0):
             break
         dist = vehicle.get_location().distance(vehicle2.get_location())
@@ -76,6 +73,7 @@ def main():
         val = 0 if val == float('-inf') else val
         robustness.append(val)
         b_robustness.append(1 if val >= 0 else 0)
+        world.tick()
 
     vehicles = world.get_actors().filter('vehicle.*')
     sensors = world.get_actors().filter('sensors.*')
