@@ -34,18 +34,18 @@ def main():
     settings.fixed_delta_seconds = 0.05
     world.apply_settings(settings)
 
-    file = "C:/Users/Deniz Gorur/PycharmProjects/Masters Project/records/FollowLeadingVehicle_1.log"
+    file = os.path.dirname(__file__) + "/records/FollowLeadingVehicle_1.log"
     info = client.show_recorder_file_info(file, True)
+    frames = int(re.search(r"Frames: (\d+)", info).group(1))
+    duration = float(re.search(r"Duration: (\d+)\.(\d+)", info).group(1))
 
     log = MetricsLog(info)
-
-    frames = log.get_total_frame_count()
-    duration = log.get_delta_time(frames - 1)
 
     ego_id = log.get_ego_vehicle_id()
     adv_id = log.get_actor_ids_with_role_name("scenario")[0]
 
     client.replay_file(file, 0, 0, ego_id)
+
     world.tick()
 
     actor_list = world.get_actors()
