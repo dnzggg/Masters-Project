@@ -4,16 +4,18 @@
         "feedback_message": "",
         "blackbox_level": 4,
         "_terminate_on_failure": false,
-        "test_status": "FAILURE",
+        "test_status": "SUCCESS",
         "expected_value_success": 0,
         "expected_value_acceptable": null,
-        "actual_value": 1,
+        "actual_value": 0,
         "optional": false,
+        "list_traffic_events": [],
         "_collision_sensor": null,
         "other_actor": null,
         "other_actor_type": null,
-        "last_id": 553,
-        "collision_time": 31.971740007400513,
+        "registered_collisions": [],
+        "last_id": null,
+        "collision_time": null,
         "terminate_on_failure": false
     }
 }

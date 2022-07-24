@@ -23,8 +23,8 @@ def main():
     # Client creation
     client = carla.Client('localhost', 2000)
     client.set_timeout(10.0)
-    
-    file = os.path.dirname(__file__) + "/records/FollowLeadingVehicle_1.log"
+
+    file = os.path.dirname(__file__) + "/records/FollowLeadingVehicle_2.log"
     info = client.show_recorder_file_info(file, True)
 
     log = MetricsLog(info)
@@ -36,14 +36,16 @@ def main():
     y = STL.parse('(y<1.5)')  # y is the relative difference between velocities
     z = STL.parse('(z<25)')  # z is the distance
     t = STL.parse('t')  # t is when the ego vehicle is decelerating due to traffic light
+
     time_headway = 1.5
     vehicle_mass = 1200
     g = -0.25 * (time_headway + 1) / vehicle_mass
+
     a = STL.parse(f'(a<{g})')  # a is the acceleration of the ego vehicle
     p = STL.parse(f'(p<{g})')  # p is the acceleration of the adversary vehicle
     phi = x
     phi2 = ~y | z | t
-    phi3 = a | (~p).historically(lo=0, hi=3)
+    phi3 = ~a | p.historically(lo=0, hi=3)
 
     robustness = []
     robustness_1 = []
@@ -67,40 +69,41 @@ def main():
     for i in range(points):
         j = i + start
 
+        trans = np.array(log.get_actor_transform(ego_id, j).get_matrix())
+        rot = trans[0:3, 0:3].T
+
         # try get_up_vector for longitudinal velocity
         vel = log.get_actor_velocity(ego_id, j)
         velocity = np.array([vel.x, vel.y, vel.z])
-        trans = np.array(log.get_actor_transform(ego_id, j).get_matrix())
-        rot = trans[0:3, 0:3].T
         v_h = (rot @ velocity)[0]
-        speed_h = vel.length()
 
         vel = log.get_actor_velocity(adv_id, j)
         velocity = np.array([vel.x, vel.y, vel.z])
-        trans = np.array(log.get_actor_transform(adv_id, j).get_matrix())
-        rot = trans[0:3, 0:3].T
         v_p = (rot @ velocity)[0]
-        speed_p = vel.length()
 
         delta_time = log.get_delta_time(j)
-        safe_distance = v_h * delta_time + 0.5 * max_acceleration * delta_time ** 2 \
-            + ((v_h + delta_time * max_acceleration) ** 2) / (2 * min_brake) \
-            - (v_p ** 2) / (2 * max_brake)
+        safe_distance = max(0, v_h * delta_time + 0.5 * max_acceleration * delta_time ** 2
+                            + ((v_h + delta_time * max_acceleration) ** 2) / (2 * min_brake)
+                            - (v_p ** 2) / (2 * max_brake))
 
         ego_location = log.get_actor_transform(ego_id, j).location
         adv_location = log.get_actor_transform(adv_id, j).location
         dist = ego_location.distance(adv_location)
 
-        acc_ego = log.get_actor_acceleration_variation(ego_id, j).x
-        acc_adv = log.get_actor_acceleration_variation(adv_id, j).x
-        print(acc_ego)
+        acc_ego = log.get_actor_acceleration_variation(ego_id, j)
+        acc_ego = np.array([acc_ego.x, acc_ego.y, acc_ego.z])
+        a_e = (rot @ acc_ego)[0]
+
+        acc_adv = log.get_actor_acceleration_variation(adv_id, j)
+        acc_adv = np.array([acc_adv.x, acc_adv.y, acc_adv.z])
+        a_a = (rot @ acc_adv)[0]
 
         sig["x"].append(dist - safe_distance)
-        sig["y"].append(speed_p - speed_h)
+        sig["y"].append(v_p - v_h)
         sig["z"].append(ego_location.distance(adv_location))
-        sig["t"].append(True if acc_ego < 0 else False)
-        sig["a"].append(acc_ego)
-        sig["p"].append(acc_adv)
+        sig["t"].append(False)  # False as there are no traffic lights or stop signs in this scenario
+        sig["a"].append(a_e)
+        sig["p"].append(a_a)
 
         time.append(log.get_platform_time(j))
 
@@ -119,7 +122,7 @@ def main():
 
     plt.plot(time, sig["x"], time, robustness, "r--")
     plt.show()
-    plt.plot(time, sig["y"], time, sig["z"], time, np.array(sig["t"])*5, time, robustness_1, "r--")
+    plt.plot(time, sig["y"], time, sig["z"], time, np.array(sig["t"]) * 5, time, robustness_1, "r--")
     plt.show()
     plt.plot(time, sig["a"], time, sig["p"], time, robustness_2, "r--")
     plt.show()
