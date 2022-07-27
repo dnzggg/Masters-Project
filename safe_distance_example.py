@@ -27,10 +27,10 @@ def main():
     world = client.get_world()
     settings = world.get_settings()
     settings.synchronous_mode = True
-    settings.fixed_delta_seconds = 0.02
+    settings.fixed_delta_seconds = 0.05
     world.apply_settings(settings)
 
-    file = os.path.dirname(__file__) + "/records/FollowLeadingVehicle_1.log"
+    file = os.path.dirname(__file__) + "/records/FollowLeadingVehicle_2.log"
     info = client.show_recorder_file_info(file, True)
 
     log = MetricsLog(info)
@@ -104,7 +104,6 @@ def main():
         ego_location = log.get_actor_transform(ego_id, j).location
         adv_location = log.get_actor_transform(adv_id, j).location
         dist = abs(ego_location.x - adv_location.x)
-        print(dist - vehicle.get_location().distance(adv_location))
 
         acc_ego = log.get_actor_acceleration_variation(ego_id, j)
         acc_ego = np.array([acc_ego.x, acc_ego.y, acc_ego.z])
@@ -117,7 +116,7 @@ def main():
         sig["x"].append(dist - safe_distance)
         sig["y"].append(v_p - v_h)
         sig["z"].append(ego_location.distance(adv_location))
-        sig["t"].append(False)  # False as there are no traffic lights or stop signs in this scenario
+        sig["t"].append(vehicle.is_at_traffic_light())
         sig["a"].append(a_e)
         sig["p"].append(a_a)
 
