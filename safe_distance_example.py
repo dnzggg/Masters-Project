@@ -24,7 +24,13 @@ def main():
     client = carla.Client('localhost', 2000)
     client.set_timeout(10.0)
 
-    file = os.path.dirname(__file__) + "/records/FollowLeadingVehicle_2.log"
+    world = client.get_world()
+    settings = world.get_settings()
+    settings.synchronous_mode = True
+    settings.fixed_delta_seconds = 0.02
+    world.apply_settings(settings)
+
+    file = os.path.dirname(__file__) + "/records/FollowLeadingVehicle_1.log"
     info = client.show_recorder_file_info(file, True)
 
     log = MetricsLog(info)
@@ -56,7 +62,7 @@ def main():
     start_ego, end_ego = log.get_actor_alive_frames(ego_id)
     start_adv, end_adv = log.get_actor_alive_frames(adv_id)
     start = max(start_ego, start_adv)
-    end = min(end_ego, end_adv)
+    end = min(end_ego, end_adv) - 1
     duration = log.get_platform_time(end) - log.get_platform_time(start)
     points = end - start
     time_period = duration
@@ -65,6 +71,15 @@ def main():
     max_acceleration = 5.4
     min_brake = 2.9
     max_brake = 9.8
+
+    client.replay_file(file, 0, 0, ego_id)
+
+    for i in range(start):
+        world.tick()
+
+    actor_list = world.get_actors()
+    vehicle = actor_list.find(ego_id)
+    vehicle2 = actor_list.find(adv_id)
 
     for i in range(points):
         j = i + start
@@ -88,7 +103,8 @@ def main():
 
         ego_location = log.get_actor_transform(ego_id, j).location
         adv_location = log.get_actor_transform(adv_id, j).location
-        dist = ego_location.distance(adv_location)
+        dist = abs(ego_location.x - adv_location.x)
+        print(dist - vehicle.get_location().distance(adv_location))
 
         acc_ego = log.get_actor_acceleration_variation(ego_id, j)
         acc_ego = np.array([acc_ego.x, acc_ego.y, acc_ego.z])
@@ -119,6 +135,7 @@ def main():
         val = 1 if val == float('inf') else val
         val = 0 if val == float('-inf') else val
         robustness_2.append(val)
+        world.tick()
 
     plt.plot(time, sig["x"], time, robustness, "r--")
     plt.show()

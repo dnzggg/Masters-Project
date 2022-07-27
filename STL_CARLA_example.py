@@ -17,25 +17,21 @@ except IndexError:
 
 import carla
 
-
-def distance(v1, v2):
-    return v1.distance(v2)
-
-
 def main():
     # Client creation
     client = carla.Client('localhost', 2000)
     client.set_timeout(10.0)
 
     world = client.get_world()
-
     settings = world.get_settings()
+    settings.synchronous_mode = True
+    settings.fixed_delta_seconds = 0.05
     world.apply_settings(settings)
 
-    file = os.path.dirname(__file__) + "/records/FollowLeadingVehicle_1.log"
+    file = os.path.dirname(__file__) + "/records/FollowLeadingVehicle_2.log"
     info = client.show_recorder_file_info(file, True)
     frames = int(re.search(r"Frames: (\d+)", info).group(1))
-    duration = float(re.search(r"Duration: (\d+)\.(\d+)", info).group(1))
+    # duration = float(re.search(r"Duration: (\d+)\.(\d+)", info).group(1))
 
     log = MetricsLog(info)
 
@@ -58,8 +54,8 @@ def main():
     b_robustness = []
     sig = {"x": [], "y": []}
     time = []
-    points = frames
-    time_period = duration
+    points = frames * 2
+    time_period = frames * 0.05
 
     for i in range(points):
         if vehicle.get_location() == carla.Location(0, 0, 0) or vehicle2.get_location() == carla.Location(0, 0, 0):
