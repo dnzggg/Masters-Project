@@ -84,17 +84,19 @@ def main():
     for i in range(points):
         j = i + start
 
-        trans = np.array(log.get_actor_transform(ego_id, j).get_matrix())
-        rot = trans[0:3, 0:3].T
+        ego_trans = np.array(log.get_actor_transform(ego_id, j).get_matrix())
+        ego_rot = ego_trans[0:3, 0:3].T
+        adv_trans = np.array(log.get_actor_transform(adv_id, j).get_matrix())
+        adv_rot = adv_trans[0:3, 0:3].T
 
         # try get_up_vector for longitudinal velocity
         vel = log.get_actor_velocity(ego_id, j)
         velocity = np.array([vel.x, vel.y, vel.z])
-        v_h = (rot @ velocity)[0]
+        v_h = (ego_rot @ velocity)[0]
 
         vel = log.get_actor_velocity(adv_id, j)
         velocity = np.array([vel.x, vel.y, vel.z])
-        v_p = (rot @ velocity)[0]
+        v_p = (adv_rot @ velocity)[0]
 
         delta_time = log.get_delta_time(j)
         safe_distance = max(0, v_h * delta_time + 0.5 * max_acceleration * delta_time ** 2
@@ -107,11 +109,11 @@ def main():
 
         acc_ego = log.get_actor_acceleration_variation(ego_id, j)
         acc_ego = np.array([acc_ego.x, acc_ego.y, acc_ego.z])
-        a_e = (rot @ acc_ego)[0]
+        a_e = (ego_rot @ acc_ego)[0]
 
         acc_adv = log.get_actor_acceleration_variation(adv_id, j)
         acc_adv = np.array([acc_adv.x, acc_adv.y, acc_adv.z])
-        a_a = (rot @ acc_adv)[0]
+        a_a = (adv_rot @ acc_adv)[0]
 
         sig["x"].append(dist - safe_distance)
         sig["y"].append(v_p - v_h)
