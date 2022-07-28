@@ -61,7 +61,7 @@ def main():
 
     start_ego, end_ego = log.get_actor_alive_frames(ego_id)
     start_adv, end_adv = log.get_actor_alive_frames(adv_id)
-    start = max(start_ego, start_adv)
+    start = max(start_ego, start_adv) - 1
     end = min(end_ego, end_adv) - 1
     duration = log.get_platform_time(end) - log.get_platform_time(start)
     points = end - start
