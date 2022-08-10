@@ -3,4 +3,4 @@
 	url = https://github.com/dnzggg/scenario_runner.git
 [submodule "leaderboard"]
 	path = leaderboard
-	url = https://github.com/dnzggg/scenario_runner.git
+	url = https://github.com/dnzggg/leaderboard.git
