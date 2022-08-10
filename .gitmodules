@@ -1,6 +1,6 @@
 [submodule "scenario_runner"]
 	path = scenario_runner
 	url = https://github.com/dnzggg/scenario_runner.git
-[submodule "leaderbaord"]
-	path = leaderbaord
+[submodule "leaderboard"]
+	path = leaderboard
 	url = https://github.com/dnzggg/scenario_runner.git
