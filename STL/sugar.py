@@ -10,7 +10,7 @@ def env(phi, *, lo=0, hi=float('inf')):
 
 
 def once(phi, *, lo=0, hi=float('inf')):
-    return ast.F_(ast.Interval(lo, hi), phi)
+    return ast.O(ast.Interval(lo, hi), phi)
 
 
 def historically(phi, *, lo=0, hi=float('inf')):
@@ -39,5 +39,20 @@ def timed_until(left, right, lo, hi):
     expr = env(right, lo=lo, hi=hi)
     expr &= alw(left, lo=0, hi=lo)
     expr &= alw(until(left, right), lo=lo, hi=lo)
+
+    return expr
+
+
+def since(phi, psi):
+    return ast.Since(phi, psi) & env(psi)
+
+
+def timed_since(left, right, lo, hi):
+    # TODO: rewrite according to definition of since
+    assert 0 <= lo < hi
+
+    expr = env(right, lo=lo, hi=hi)
+    expr &= alw(left, lo=0, hi=lo)
+    expr &= alw(since(left, right), lo=lo, hi=lo)
 
     return expr

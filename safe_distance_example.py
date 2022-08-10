@@ -30,7 +30,7 @@ def main():
     settings.fixed_delta_seconds = 0.05
     world.apply_settings(settings)
 
-    file = os.path.dirname(__file__) + "/records/FollowLeadingVehicle_2.log"
+    file = os.path.dirname(__file__) + "/records/FollowLeadingVehicleWithObstacle_1.log"
     info = client.show_recorder_file_info(file, True)
 
     log = MetricsLog(info)
@@ -72,7 +72,7 @@ def main():
     min_brake = 2.9
     max_brake = 9.8
 
-    client.replay_file(file, 0, 0, ego_id)
+    client.replay_file(file, 0, 0, ego_id, True)
 
     for i in range(start):
         world.tick()
@@ -89,10 +89,14 @@ def main():
         adv_trans = np.array(log.get_actor_transform(adv_id, j).get_matrix())
         adv_rot = adv_trans[0:3, 0:3].T
 
+        up_vec = log.get_actor_transform(ego_id, j).get_up_vector()
+
         # try get_up_vector for longitudinal velocity
         vel = log.get_actor_velocity(ego_id, j)
         velocity = np.array([vel.x, vel.y, vel.z])
         v_h = (ego_rot @ velocity)[0]
+
+        # print(v_h - up_vec.cross(vel).y)
 
         vel = log.get_actor_velocity(adv_id, j)
         velocity = np.array([vel.x, vel.y, vel.z])
@@ -108,12 +112,14 @@ def main():
         dist = abs(ego_location.x - adv_location.x)
 
         acc_ego = log.get_actor_acceleration_variation(ego_id, j)
-        acc_ego = np.array([acc_ego.x, acc_ego.y, acc_ego.z])
-        a_e = (ego_rot @ acc_ego)[0]
+        acceleration_ego = np.array([acc_ego.x, acc_ego.y, acc_ego.z])
+        a_e = (ego_rot @ acceleration_ego)[0]
+
+        print(up_vec.cross(acc_ego).y > 10)
 
         acc_adv = log.get_actor_acceleration_variation(adv_id, j)
-        acc_adv = np.array([acc_adv.x, acc_adv.y, acc_adv.z])
-        a_a = (adv_rot @ acc_adv)[0]
+        acceleration_adv = np.array([acc_adv.x, acc_adv.y, acc_adv.z])
+        a_a = (adv_rot @ acceleration_adv)[0]
 
         sig["x"].append(dist - safe_distance)
         sig["y"].append(v_p - v_h)

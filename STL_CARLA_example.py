@@ -17,6 +17,7 @@ except IndexError:
 
 import carla
 
+
 def main():
     # Client creation
     client = carla.Client('localhost', 2000)
@@ -58,7 +59,8 @@ def main():
     time_period = frames * 0.05
 
     for i in range(points):
-        if vehicle.get_location() == carla.Location(0, 0, 0) or vehicle2.get_location() == carla.Location(0, 0, 0):
+        if (vehicle.get_location() == carla.Location(0, 0, 0) or
+                vehicle2.get_location() == carla.Location(0, 0, 0)):
             break
         dist = vehicle.get_location().distance(vehicle2.get_location())
         sig["x"].append(dist)

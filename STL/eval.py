@@ -43,7 +43,7 @@ def evaluate_f(phi, sig, time, t=0, points=500, time_period=20):
     return m
 
 
-@evaluate.register(ast.F_)
+@evaluate.register(ast.O)
 def evaluate_f_(phi, sig, time, t=0, points=500, time_period=20):
     p = re.sub(r"(\d)+(\.\d)?,((\d)+(\.\d)?|inf)", "", str(phi))
     p = p.strip("O").strip("[").strip("]").strip("~").strip("(").strip(")").replace(" ", "")

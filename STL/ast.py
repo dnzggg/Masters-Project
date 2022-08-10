@@ -41,20 +41,6 @@ def _neg(exp):
     return Neg(exp)
 
 
-def _eval(exp, trace, time=False, *, dt=0.1, quantitative=True):
-    from mtl import evaluator
-    return evaluator.pointwise_sat(exp, dt)(trace, time, quantitative)
-
-
-def _timeshift(exp, t):
-    if exp == BOT:
-        return exp
-
-    for _ in range(t):
-        exp = Next(exp)
-    return exp
-
-
 def _walk(exp):
     """Walk of the AST."""
     pop = deque.pop
@@ -117,8 +103,6 @@ def ast_class(cls):
     cls.__or__ = _or
     cls.__and__ = _and
     cls.__invert__ = _neg
-    cls.__call__ = _eval
-    cls.__rshift__ = _timeshift
     cls.__getitem__ = _inline_context
     cls.walk = _walk
     cls.params = property(_params)
@@ -127,9 +111,10 @@ def ast_class(cls):
     cls.iff = sugar.iff
     cls.implies = sugar.implies
     # Avoid circular dependence.
-    # cls.weak_until = lambda a, b: WeakUntil(a, b)
     cls.until = sugar.until
+    cls.since = sugar.since
     cls.timed_until = sugar.timed_until
+    cls.timed_since = sugar.timed_since
     cls.always = sugar.alw
     cls.eventually = sugar.env
     cls.once = sugar.once
@@ -165,6 +150,7 @@ class AtomicPred:
     def __repr__(self):
         return f"{self.id}"
 
+
 @ast_class
 class AtomicExpr:
     id: str
@@ -184,7 +170,7 @@ class Interval(NamedTuple):
 @ast_class
 class NaryOpMTL:
     OP = "?"
-    args: Node  # TODO: when 3.7 is more common replace with type union.
+    args: Node
 
     def __repr__(self):
         return "(" + f" {self.OP} ".join(f"{x}" for x in self.args) + ")"
@@ -226,11 +212,11 @@ class F(ModalOp):
     OP = "F"
 
 
-class G_(ModalOp):
+class H(ModalOp):
     OP = "H"
 
 
-class F_(ModalOp):
+class O(ModalOp):
     OP = "O"
 
 
@@ -244,7 +230,20 @@ class Until:
 
     @property
     def children(self):
-        return (self.arg1, self.arg2)
+        return self.arg1, self.arg2
+
+
+@ast_class
+class Since:
+    arg1: Node
+    arg2: Node
+
+    def __repr__(self):
+        return f"({self.arg1} S {self.arg2})"
+
+    @property
+    def children(self):
+        return self.arg1, self.arg2
 
 
 @ast_class
@@ -256,19 +255,7 @@ class Neg:
 
     @property
     def children(self):
-        return (self.arg,)
-
-
-@ast_class
-class Next:
-    arg: Node
-
-    def __repr__(self):
-        return f"X{self.arg}"
-
-    @property
-    def children(self):
-        return (self.arg,)
+        return self.arg,
 
 
 def type_pred(*args):

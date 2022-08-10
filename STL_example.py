@@ -46,21 +46,22 @@ import STL
 # Slide example
 points = 510
 
+sig = dict()
 time_period = 6
 time = np.linspace(0, 6, points, endpoint=True)
-sig = [0, 2, 4, 2, 0, 2.1, 0]
+sig1 = [0, 2, 4, 2, 0, 2.1, 0]
 temp = np.array([])
-for i, s in enumerate(sig):
+for i, s in enumerate(sig1):
     try:
-        b = np.linspace(sig[i], sig[i + 1], int(points / time_period))
+        b = np.linspace(sig1[i], sig1[i + 1], int(points / time_period))
     except IndexError:
         b = np.linspace(0, 0, int(points / time_period))
     if len(temp) < points:
         temp = np.concatenate((temp, b), axis=0)
-sig = temp
+sig['x'] = temp
 
 x = STL.parse('(x<2)')
-phi = x.always()
+phi = x.eventually(lo=0, hi=1)
 
 robustness = []
 b_robustness = []
@@ -86,7 +87,7 @@ plt.ylim(-0.01, 4.01)
 plt.xlim(0, 6)
 plt.xlabel("Time (t)")
 plt.ylabel("Signal (x)")
-plt.plot(time, sig, "r")
+plt.plot(time, sig['x'], "r")
 plt.box(False)
 plt.show()
 

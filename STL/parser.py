@@ -12,13 +12,12 @@ MTL = TypeVar("STL")
 
 
 MTL_GRAMMAR = Grammar(u'''
-phi = (neg / paren_phi / next / bot / top / smaller / smaller_equal
+phi = (neg / paren_phi / bot / top / smaller / smaller_equal
      / xor_outer / iff_outer / implies_outer / and_outer / or_outer
-     / timed_until / until / weak_until / f / g / o / h / AP)
+     / timed_until / until / timed_since / since / weak_until / f / g / o / h / AP)
 
 paren_phi = "(" __ phi __ ")"
 neg = ("~" / "¬") __ phi
-next = ("@" / "X") __ phi
 
 and_outer = "(" __ and_inner __ ")"
 and_inner = (phi __ ("∧" / "and" / "&") __ and_inner) / phi
@@ -45,6 +44,8 @@ h = ("[-]" / "H") interval? __ phi
 weak_until = "(" __ phi _ "W" _ phi __ ")"
 until = "(" __ phi _ "U" _ phi __ ")"
 timed_until = "(" __ phi _ "U" interval _ phi __ ")"
+since = "(" __ phi _ "S" _ phi __ ")"
+timed_since = "(" __ phi _ "S" interval _ phi __ ")"
 interval = "[" __ const_or_unbound __ "," __ const_or_unbound __ "]"
 
 const_or_unbound = const / "inf" / id
@@ -141,6 +142,14 @@ class MTLVisitor(NodeVisitor):
         _, _, phi1, _, _, itvl, _, phi2, _, _ = children
         return phi1.timed_until(phi2, itvl.lower, itvl.upper)
 
+    def visit_since(self, _, children):
+        _, _, phi1, _, _, _, phi2, _, _ = children
+        return phi1.since(phi2)
+
+    def visit_timed_since(self, _, children):
+        _, _, phi1, _, _, itvl, _, phi2, _, _ = children
+        return phi1.timed_since(phi2, itvl.lower, itvl.upper)
+
     def visit_id(self, name, _):
         return name.text
 
@@ -155,9 +164,6 @@ class MTLVisitor(NodeVisitor):
 
     def visit_neg(self, _, children):
         return ~children[2]
-
-    def visit_next(self, _, children):
-        return ast.Next(children[2])
 
 
 def parse(mtl_str: str, rule: str = "phi", H=oo) -> "MTL":
