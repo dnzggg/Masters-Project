@@ -18,7 +18,7 @@ except IndexError:
 
 import carla
 
-
+# Works with only two vehicles
 def main():
     # Client creation
     client = carla.Client('localhost', 2000)
@@ -42,6 +42,7 @@ def main():
     y = STL.parse('(y<1.5)')  # y is the relative difference between velocities
     z = STL.parse('(z<25)')  # z is the distance
     t = STL.parse('t')  # t is when the ego vehicle is decelerating due to traffic light
+    u = STL.parse('(u<0)')  # u is the lateral distance - safe distance
 
     time_headway = 1.5
     vehicle_mass = 1200
@@ -106,7 +107,7 @@ def main():
         safe_distance = max(0, v_h * delta_time + 0.5 * max_acceleration * delta_time ** 2
                             + ((v_h + delta_time * max_acceleration) ** 2) / (2 * min_brake)
                             - (v_p ** 2) / (2 * max_brake))
-
+        print(safe_distance)
         ego_location = log.get_actor_transform(ego_id, j).location
         adv_location = log.get_actor_transform(adv_id, j).location
         dist = abs(ego_location.x - adv_location.x)
@@ -115,7 +116,7 @@ def main():
         acceleration_ego = np.array([acc_ego.x, acc_ego.y, acc_ego.z])
         a_e = (ego_rot @ acceleration_ego)[0]
 
-        print(up_vec.cross(acc_ego).y > 10)
+        # print(up_vec.cross(acc_ego).y > 10)
 
         acc_adv = log.get_actor_acceleration_variation(adv_id, j)
         acceleration_adv = np.array([acc_adv.x, acc_adv.y, acc_adv.z])
@@ -127,6 +128,8 @@ def main():
         sig["t"].append(vehicle.is_at_traffic_light())
         sig["a"].append(a_e)
         sig["p"].append(a_a)
+
+        # print(vehicle.is_at_traffic_light())
 
         time.append(log.get_platform_time(j))
 
