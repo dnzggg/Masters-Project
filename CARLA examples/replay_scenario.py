@@ -57,8 +57,8 @@ def main():
         print(vehicle.get_acceleration())
         w = world.get_snapshot()
         print(w.timestamp)
-        # if i % 20 == 0:
-        #     image.save_to_disk('%s/%s.png' % (camera.type_id, image.frame))
+        if i % 20 == 0:
+            image.save_to_disk('%s/%s.png' % (camera.type_id, image.frame))
 
     vehicles = world.get_actors().filter('vehicle.*')
     sensors = world.get_actors().filter('sensors.*')

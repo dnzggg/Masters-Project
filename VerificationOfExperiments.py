@@ -18,12 +18,11 @@ except IndexError:
 
 import carla
 
-max_longitudinal_acceleration = 5.4
-min_longitudinal_brake = 2.9
-max_longitudinal_brake = 9.8
-max_lateral_acceleration = 3.92
-min_lateral_brake = 0.35
-max_lateral_brake = 3
+max_longitudinal_acceleration = 3.5
+min_longitudinal_brake = 4.0
+max_longitudinal_brake = 8.0
+max_lateral_acceleration = 0.2
+min_lateral_brake = 0.8
 
 
 def get_rotation_matrix(log, ego_id, adv, j):
