@@ -73,5 +73,5 @@ Check [Leaderboard](leaderboard/README.md) for a more detailed overview. There h
 
 To run the [Leaderboard evaluator](leaderboard/leaderboard/leaderboard_evaluator.py), [Leaderboard runner](leaderboard/scripts/run_evaluation.py) is used:
 ```bash
-python run_evaluation.py
+python run_experiments.py
 ```
