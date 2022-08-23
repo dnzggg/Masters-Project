@@ -3,7 +3,7 @@ import os
 import re
 import sys
 import matplotlib.pyplot as plt
-from scenario_runner.srunner.metrics.tools.metrics_log import MetricsLog
+from srunner.metrics.tools.metrics_log import MetricsLog
 
 import STL
 

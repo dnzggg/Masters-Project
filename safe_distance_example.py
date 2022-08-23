@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 import STL
-from scenario_runner.srunner.metrics.tools.metrics_log import MetricsLog
+from srunner.metrics.tools.metrics_log import MetricsLog
 
 try:
     sys.path.append(glob.glob('carla-*%d.%d-%s.egg' % (

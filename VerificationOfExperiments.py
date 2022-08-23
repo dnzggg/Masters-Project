@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 import STL
-from scenario_runner.srunner.metrics.tools.metrics_log import MetricsLog
+from srunner.metrics.tools.metrics_log import MetricsLog
 
 try:
     sys.path.append(glob.glob('carla-*%d.%d-%s.egg' % (
@@ -76,6 +76,7 @@ def calculate_minimal_safe_longitudinal_distance(log, ego, adv, j):
                         - (v_p ** 2) / (2 * max_longitudinal_brake))
     return safe_distance
 
+
 # Works with only two vehicles
 def main():
     # Client creation
@@ -88,7 +89,7 @@ def main():
     settings.fixed_delta_seconds = 0.05
     world.apply_settings(settings)
 
-    file = os.path.dirname(__file__) + "/records/RouteScenario_0_rep0.log"
+    file = os.path.dirname(__file__) + "/records/basic_agentRouteScenario_0_rep0.log"
     info = client.show_recorder_file_info(file, True)
 
     log = MetricsLog(info)
@@ -130,7 +131,7 @@ def main():
         closest_vehicle_in_front = (None, float('inf'))
         closest_vehicle_side = (None, float('inf'))
         waypoint = world.get_map().get_waypoint(ego_vehicle.get_location(), project_to_road=False,
-                                                lane_type=carla.LaneType.Driving)
+                                                lane_type=carla.LaneType.Driving | carla.LaneType.Shoulder)
         for a in actor_list:
             if a.id != ego_id:
                 waypoint_adv = world.get_map().get_waypoint(a.get_location(), project_to_road=False,
@@ -166,14 +167,19 @@ def main():
                             closest_vehicle_side = a, distance
                 except AttributeError:
                     pass
-        lane_width = waypoint.lane_width / 2
-        if closest_vehicle_side[0] is not None:
-            safe_lateral_distance = calculate_minimal_safe_lateral_distance(log, ego_vehicle, closest_vehicle_side[0], j)
-            print(safe_lateral_distance + lane_width)
-            print(closest_vehicle_side[1])
+        try:
+            lane_width = waypoint.lane_width / 2
+            if closest_vehicle_side[0] is not None:
+                safe_lateral_distance = calculate_minimal_safe_lateral_distance(log, ego_vehicle, closest_vehicle_side[0],
+                                                                                j)
+                print(safe_lateral_distance + lane_width)
+                print(closest_vehicle_side[1])
+        except AttributeError:
+            pass
         if closest_vehicle_in_front[0] is not None:
             print("In front", closest_vehicle_in_front[0].id)
-            safe_longitudinal_distance = calculate_minimal_safe_longitudinal_distance(log, ego_vehicle, closest_vehicle_in_front[0], j)
+            safe_longitudinal_distance = calculate_minimal_safe_longitudinal_distance(log, ego_vehicle,
+                                                                                      closest_vehicle_in_front[0], j)
             print(safe_longitudinal_distance)
 
         world.tick()
