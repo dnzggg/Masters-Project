@@ -15,6 +15,8 @@ Table of Contents
   - [STL Examples](#stl-examples)
 - [ScenarioRunner Examples](#scenariorunner)
 - [Leaderboard](#leaderboard)
+- [Setting-up Experiments](#setting-up-experiments)
+- [Verification](#verification-of-scenarios)
 
 Signal Temporal Logic Library
 -----------------------------
@@ -83,7 +85,15 @@ Leaderboard uses ScenarioRunner to run an agent passed to it in a route. During 
 
 Check [Leaderboard](leaderboard/README.md) for a more detailed overview. There has been minor changes in the code, but nothing that changes the functionality.
 
-To run the [Leaderboard evaluator](leaderboard/leaderboard/leaderboard_evaluator.py), [Leaderboard runner](leaderboard/scripts/run_evaluation.py) is used:
+To run the [Leaderboard evaluator](leaderboard/leaderboard/leaderboard_evaluator.py):
 ```bash
 python run_experiments.py
 ```
+
+Setting-up Experiments
+-------------------
+Setting environment variables.
+
+Verification of Scenarios
+-------------------------
+[Verification](VerificationOfExperiments.py)
