@@ -30,7 +30,7 @@ def iff(x, y):
 
 
 def until(phi, psi):
-    return ast.Until(phi, psi) & env(psi)
+    return ast.Until(phi, psi)
 
 
 def timed_until(left, right, lo, hi):
@@ -44,7 +44,7 @@ def timed_until(left, right, lo, hi):
 
 
 def since(phi, psi):
-    return ast.Since(phi, psi) & env(psi)
+    return ast.Since(phi, psi)
 
 
 def timed_since(left, right, lo, hi):

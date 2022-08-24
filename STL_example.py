@@ -59,9 +59,11 @@ for i, s in enumerate(sig1):
     if len(temp) < points:
         temp = np.concatenate((temp, b), axis=0)
 sig['x'] = temp
+sig['t'] = time
 
 x = STL.parse('(x<2)')
-phi = x.eventually(lo=0, hi=1)
+t = STL.parse('(t<4)')
+phi = x.until(t)
 
 robustness = []
 b_robustness = []

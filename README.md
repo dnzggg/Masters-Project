@@ -24,6 +24,18 @@ Also, [playing around with STL](testing_stl_without_library.py) was a good stari
 
 Running the Examples
 ---------------------
+Before running the examples some environment variables need to be set.
+For linux, use:
+```bash
+export CARLA_ROOT=/path/to/carla
+export ...
+```
+For windows, use:
+```powershell
+set CARLA_ROOT=C:\path\to\carla
+set ...
+```
+
 ### CARLA Examples
 To be able to run the examples, you need to have a running CARLA server. To start the server, run the following command:
 For linux, use:

@@ -31,8 +31,8 @@ def main():
 
     file = os.path.dirname(__file__) + "/records/FollowLeadingVehicle_2.log"
     info = client.show_recorder_file_info(file, True)
-    frames = int(re.search(r"Frames: (\d+)", info).group(1))
-    # duration = float(re.search(r"Duration: (\d+)\.(\d+)", info).group(1))
+    frames = int(re.search(r"Frames: (\d+)",
+                           info).group(1))
 
     log = MetricsLog(info)
 
@@ -49,7 +49,7 @@ def main():
 
     x = STL.parse('(x<20)')
     y = STL.parse('<->[0,1] y')
-    phi = x.once(lo=0, hi=5)
+    phi = x.once(lo=0, hi=5) and y
 
     robustness = []
     b_robustness = []
@@ -59,14 +59,17 @@ def main():
     time_period = frames * 0.05
 
     for i in range(points):
-        if (vehicle.get_location() == carla.Location(0, 0, 0) or
-                vehicle2.get_location() == carla.Location(0, 0, 0)):
+        if (vehicle.get_location() == carla.Location(0, 0, 0)
+                or vehicle2.get_location() ==
+                carla.Location(0, 0, 0)):
             break
-        dist = vehicle.get_location().distance(vehicle2.get_location())
+        dist = vehicle.get_location().distance(
+            vehicle2.get_location())
         sig["x"].append(dist)
         sig["y"].append(vehicle.is_at_traffic_light())
         time.append(i * 0.05)
-        val = STL.evaluate(phi, sig, time, t=i, points=points, time_period=time_period)
+        val = STL.evaluate(phi, sig, time, t=i, points=points,
+                           time_period=time_period)
         val = 1 if val == float('inf') else val
         val = 0 if val == float('-inf') else val
         robustness.append(val)
