@@ -2,10 +2,16 @@ import os
 import subprocess
 import time
 
-scenario = "SignalizedJunctionRightTurn_5"
+# scenario = "SignalizedJunctionRightTurn_5"
+# scenario = "SignalizedJunctionRightTurn_7"
+scenario = "SignalizedJunctionRightTurn_6"
+# scenario = "SignalizedJunctionLeftTurn_4"
+# scenario = "SignalizedJunctionLeftTurn_6"
 
-script1 = subprocess.Popen(["python", "--randomize","--sync"
+
+script1 = subprocess.Popen(["python",
                             "scenario_runner/scenario_runner.py",
+                            "--randomize", "--sync",
                             "--reloadWorld", "--record",
                             os.path.dirname(__file__) + "/records",
                             "--scenario", scenario])

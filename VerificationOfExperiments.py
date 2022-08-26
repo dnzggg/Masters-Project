@@ -89,7 +89,7 @@ def main():
     settings.fixed_delta_seconds = 0.05
     world.apply_settings(settings)
 
-    file = os.path.dirname(__file__) + "/records/basic_agentRouteScenario_0_rep0.log"
+    file = os.path.dirname(__file__) + "/records/basic_agentRouteScenario_2_rep0.log"
     info = client.show_recorder_file_info(file, True)
 
     log = MetricsLog(info)
@@ -108,6 +108,14 @@ def main():
     duration = log.get_platform_time(end) - log.get_platform_time(start)
     points = end - start
     time_period = duration
+
+    vehicles = world.get_actors().filter('vehicle.*')
+    sensors = world.get_actors().filter('sensors.*')
+    for a in vehicles:
+        a.destroy()
+    for a in sensors:
+        a.destroy()
+    world.tick()
 
     client.replay_file(file, 0, 0, ego_id, True)
 
