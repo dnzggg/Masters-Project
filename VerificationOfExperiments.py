@@ -89,14 +89,15 @@ def main():
     settings.fixed_delta_seconds = 0.05
     world.apply_settings(settings)
 
-    file = os.path.dirname(__file__) + "/records/basic_agentRouteScenario_2_rep0.log"
+    file = os.path.dirname(__file__) + "/records/transfuserRouteScenario_3_rep2.log"
     info = client.show_recorder_file_info(file, True)
 
     log = MetricsLog(info)
 
     ego_id = log.get_ego_vehicle_id()
 
-    robustness = []
+    robustness_lon = []
+    robustness_lat = []
     robustness_1 = []
     robustness_2 = []
     sig = {"x": [], "y": [], "z": [], "t": [], "a": [], "p": []}

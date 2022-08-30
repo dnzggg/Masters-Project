@@ -4,10 +4,11 @@ import time
 
 # scenario = "SignalizedJunctionRightTurn_5"
 # scenario = "SignalizedJunctionRightTurn_7"
-scenario = "SignalizedJunctionRightTurn_6"
 # scenario = "SignalizedJunctionLeftTurn_4"
 # scenario = "SignalizedJunctionLeftTurn_6"
-
+# scenario = "SignalizedJunctionLeftTurn_5"
+# scenario = "SignalizedJunctionRightTurn_6"
+scenario = "FollowLeadingVehicle_8"
 
 script1 = subprocess.Popen(["python",
                             "scenario_runner/scenario_runner.py",
