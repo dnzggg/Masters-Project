@@ -26,16 +26,27 @@ Also, [playing around with STL](testing_stl_without_library.py) was a good stari
 
 Running the Examples
 ---------------------
-Before running the examples some environment variables need to be set.
+To set up the environment, first you need to [install](https://github.com/carla-simulator/carla/blob/master/Docs/download.md) carla.
+Then, you need to download the submodules (ScenarioRunner and Leaderboard) using the following command:
+```bash
+git submodule update --init
+```
+Finally, some environment variables need to be set.
 For linux, use:
 ```bash
 export CARLA_ROOT=/path/to/carla
-export ...
+export SCENARIO_RUNNER_ROOT=/path/to/scenario_runner
+export LEADERBOARD_ROOT=/path/to/leaderboard
+export PYTHONPATH=${CARLA_ROOT}/PythonAPI/carla/dist/carla-0.9.13-py3.6-linux-x86_64.egg:${CARLA_ROOT}/PythonAPI/carla:${SCENARIO_RUNNER_ROOT}
+export CHALLENGE_TRACK_CODENAME=SENSORS
 ```
 For windows, use:
 ```powershell
 set CARLA_ROOT=C:\path\to\carla
-set ...
+set SCENARIO_RUNNER_ROOT=C:\path\to\scenario_runner
+set LEADERBOARD_ROOT=C:\path\to\leaderboard
+set PYTHONPATH=${CARLA_ROOT}\PythonAPI\carla\dist\carla-0.9.13-py3.6-win-amd64.egg;${CARLA_ROOT}\PythonAPI\carla;${SCENARIO_RUNNER_ROOT}
+set CHALLENGE_TRACK_CODENAME=SENSORS
 ```
 
 ### CARLA Examples
@@ -66,7 +77,11 @@ Scenic Python API works by using the map and the scenario file to generate a sce
 
 
 ### STL Examples
-[STL testing](STL_example.py), [STL with CARLA](STL_CARLA_example.py), [Safe Longitudinal Distance](safe_distance_example.py),
+[STL testing](STL_example.py) was used for testing if the STL library worked as intended.
+
+[STL with CARLA](STL_CARLA_example.py) was used to show if the STL library and a recorded CARLA scenario can be used together.
+
+[Safe Longitudinal Distance](safe_distance_example.py) was used to show how a formalised rule can be monitored in carla, the rule is a safe longitudinal distance rule and an automatic cruise control system rules.
 
 
 ScenarioRunner
@@ -87,13 +102,28 @@ Check [Leaderboard](leaderboard/README.md) for a more detailed overview. There h
 
 To run the [Leaderboard evaluator](leaderboard/leaderboard/leaderboard_evaluator.py):
 ```bash
-python run_experiments.py
+python leaderboard/scripts/run_evaluation.sh
 ```
 
 Setting-up Experiments
 -------------------
-Setting environment variables.
+To run the experiments, ```run_experiments.py``` is used. This script goes through all the agents and scenarios and record them while running them.
+As the script uses Leaderboard to run the scenarios, the scenarios are recorded at the ```records/``` folder.
 
-Verification of Scenarios
+The agents used are [Basic Agent](leaderboard/leaderboard/autoagents/basic_agent.py), [Behaviour Agent](leaderboard/leaderboard/autoagents/behaviour_agent.py), and the TransFuser agent.
+
+To be able to use the TransFuser agent clone the repository:
+```bash
+git clone https://github.com/autonomousvision/transfuser.git
+```
+and follow the instructions in the README.md file.
+
+Set the environment variable TRANSFUSER_ROOT to the path to the repository:
+```bash
+export TRANSFUSER_ROOT=path/to/transfuser
+```
+
+Verification of Experiments
 -------------------------
-[Verification](VerificationOfExperiments.py)
+In order to monitor the experiments, to be able to collect data ```VerificationOfExperiments.py``` is used.
+This is similar to the examples above in the [STL Examples](#stl-examples) section.
